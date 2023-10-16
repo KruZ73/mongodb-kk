@@ -1,31 +1,16 @@
 const { MongoClient } = require('mongodb');
 const mongoString = "";
 
-async function main() {
-    //stworz nowe połaczenie do bazy danych pod nazwa client używając sterownika MongoClient (alias do mongodb)
-    //i danych do połaczenia wygenerowanych z atlasa
+//funkcja tworząca połaczenie
+async function connect() {
     const client = new MongoClient(mongoString);
-
     try {
-        //to spróbuje się zrobić
-        //uwaga - otwieram połączenie - to może potrwać więc dajemy await
         await client.connect();
-        //pokaż listę baz danych
-        //      await listDB(client);
-
-        await getOneByName(client, "Ocean View");
-
+        return client;
     } catch (e) {
-        //jeśli się wywali na twarz - wyświetl szczegóły w konsoli
-        console.error(e)
-    } finally {
-        //tak czy owak na koniec się zrobi
-        //zamykamy połaczenie
-        await client.close();
+        console.error(e);
     }
 }
-
-
 //ściągnij listę baz danych i wyświetl w konsoli 
 //jako parametr przyjmuje połaczenie do bazy
 async function listDB(client) {
@@ -38,35 +23,27 @@ async function listDB(client) {
         console.log("Baza: " + database.name);
     });
 }
-
-
-async function connect() {
-    const client = new MongoClient(mongoString);
-    try {
-        await client.connect();
-        return 
-    } catch (e) {
-        console.error(e);
-    }
-}
-
-
+//ściagnij jeden lokal z bazy airbnb po jego nazwie
 async function getOneByName(client, name) {
-    const result = await client.db("sample_airbnb").collection("ListeningsAndReviews").findOne(
+    //wez dane z bazy o nazwie "sample_airbrb", z kolekcji o nazwie "listingsAndReviews"
+    const result = await client.db("sample_airbnb").collection("listingsAndReviews").findOne(
+        //findOne jest funkcją zaprogramowaną w sterowniku do mongodb
+        //potrzebuje ona filtra (odpowiednik WHERE w mysql zdefiniowanego w jsonie)
         {
-            name: "Horto flat with small garden"
+            name: name
         }
-    );
+    ); //koniec findOne()
+    //jeśli uda  się znaleźć pasujący rekord
     if(result) {
-        console.log("znaleziono pasujący rekord:");
-        console.log(result);
+        return result;
+    //jeśli nie:
     } else {
-        console.log("nie znaleziono pasującego rekordu:");
+        console.log("Nie znaleziono pasującego rekordu:");
     }
 }
 
-module 
+function close(client) {
+    client.close();
+}
 
-
-//uruchom funkcje main - jeśli coś pójdzie nie tak to wyrzuc bład na konsole
-main().catch(console.error);
+module.exports = {connect, listDB, getOneByName, close}

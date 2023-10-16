@@ -1,5 +1,5 @@
 const { MongoClient } = require('mongodb');
-const mongoString = "";
+const mongoString = "mongodb+srv://admin:w7ArSUVAh2HXjM6R@cluster0.qtyrl5o.mongodb.net/?retryWrites=true&w=majority";
 
 //funkcja tworząca połaczenie
 async function connect() {
@@ -30,7 +30,7 @@ async function getOneByName(client, name) {
         //findOne jest funkcją zaprogramowaną w sterowniku do mongodb
         //potrzebuje ona filtra (odpowiednik WHERE w mysql zdefiniowanego w jsonie)
         {
-            name: name
+            "name": name
         }
     ); //koniec findOne()
     //jeśli uda  się znaleźć pasujący rekord
